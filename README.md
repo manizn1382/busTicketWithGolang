@@ -6,7 +6,8 @@ The platform provides an end-to-end service that covers everything from searchin
 
 ## data model
 
-<img width="1421" height="570" alt="horizon" src="https://github.com/user-attachments/assets/cfd6728a-7401-4e1f-8eab-c21d2d337707" />
+<img width="1421" height="870" alt="Untitled (2)" src="https://github.com/user-attachments/assets/283d9e3b-1f22-4042-b309-efbd8b267f81" />
+
 
 for more detail watch this [link](https://dbdiagram.io/d/68a331fcec93249d1e1717ec)
 
