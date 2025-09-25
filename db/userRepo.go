@@ -7,6 +7,8 @@ import(
 	"log"
 	"tick/model"
 	"database/sql"
+	"crypto/sha256"
+    "encoding/hex"
 )
 
 func AddUser(userName , phoneNumber string) (string) {
@@ -103,7 +105,7 @@ func GetUserById(userId int) (*model.User,error) {
 
 }
 
-func UpdateUser(userInfo *model.User) (*sql.Result,error) {
+func UpdateUser(userInfo *model.User,newPassWord string) (*sql.Result,error) {
 
 	db,err := sql.Open("mysql",config.Dsn)
 
@@ -113,12 +115,21 @@ func UpdateUser(userInfo *model.User) (*sql.Result,error) {
 
 	defer db.Close()
 
+	if newPassWord != nil{
+		hash := sha256.Sum256([]byte(newPassWord))
+		newPassWordHash := hex.EncodeToString(hash[:])
+		userInfo.PassHash = newPassWordHash
+	}
+
+
+    // Convert hash to hexadecimal string
+
 	
 	res,err := db.Exec(
 	    `update User 
 		set userName = ?, userRole = ?, phoneNumber = ?, passwordHash = ?, nationalId = ?
 		where userId = ?`,
-		userInfo.Name,userInfo.Role,userInfo.Phone,12,userInfo.NationalId,userInfo.UserId,   
+		userInfo.Name,userInfo.Role,userInfo.Phone,userInfo.PassHash,userInfo.NationalId,userInfo.UserId,   
 	)
 
 	if err != nil{
