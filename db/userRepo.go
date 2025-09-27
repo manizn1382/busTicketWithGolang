@@ -1,14 +1,15 @@
 package db
 
-import(
-	"tick/config"
-	"fmt"
-	"time"
-	"log"
-	"tick/model"
-	"database/sql"
+import (
 	"crypto/sha256"
-    "encoding/hex"
+	"database/sql"
+	"encoding/hex"
+	"errors"
+	"fmt"
+	"log"
+	"tick/config"
+	"tick/model"
+	"time"
 )
 
 func AddUser(u model.User) (string) {
@@ -37,7 +38,7 @@ func AddUser(u model.User) (string) {
 	}
 
 	id,_ := res.LastInsertId()
-	return fmt.Sprintf("%s: %d","last insert id is: ",id) 
+	return fmt.Sprintf("%s: %d","last insert id for user is: ",id) 
 
 }
 
@@ -135,10 +136,12 @@ func UpdateUser(u *model.User) (*sql.Result,error) {
 
 	if err != nil{
 		log.Fatal(err)
-		return nil,err
+		return nil,errors.New("can't update User with these info")
 	}
 	return &res,nil
 }
+
+
 
 
 func DeleteUser(nId int) (*sql.Result,error){
@@ -158,12 +161,25 @@ func DeleteUser(nId int) (*sql.Result,error){
 	)
 
 	if err != nil{
+		return nil,errors.New("can't execute query for this national id")
+	}
+
+	affect,err := res.RowsAffected()
+
+	if affect == 0{
+		return nil,errors.New("doesn't exist user with this national id")
+	}
+
+
+	if err != nil{
 		log.Fatal(err)
 		return nil,err
 	}
 
 	return &res,err
 }
+
+
 
 
 
