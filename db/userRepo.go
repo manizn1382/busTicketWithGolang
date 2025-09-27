@@ -75,7 +75,7 @@ func GetUserByPhone(phoneNumber string) (*model.User,error){
 
 }
 
-func GetUserById(userId int) (*model.User,error) {
+func GetUserByNationalId(nId string) (*model.User,error) {
 
 	db,err := sql.Open("mysql",config.Dsn)
 
@@ -88,19 +88,17 @@ func GetUserById(userId int) (*model.User,error) {
 	userInfo := model.User{}
 
 	res := db.QueryRow(
-		"select * from User where userId = ?",
-		userId,
+		"select * from User where nationalId = ?",
+		nId,
 	).Scan(
 		&userInfo.UserId,
-		&userInfo.CreateAt,
 		&userInfo.Name,
-		&userInfo.NationalId,
-		&userInfo.Phone,
-		&userInfo.PassHash,
 		&userInfo.Role,
+		&userInfo.PassHash,
+		&userInfo.Phone,
+		&userInfo.CreateAt,
+		&userInfo.NationalId,
 	)
-
-	fmt.Println(res)
 
 
 	if res != nil{
@@ -112,7 +110,7 @@ func GetUserById(userId int) (*model.User,error) {
 
 }
 
-func UpdateUser(userInfo *model.User,newPassWord string) (*sql.Result,error) {
+func UpdateUser(u *model.User) (*sql.Result,error) {
 
 	db,err := sql.Open("mysql",config.Dsn)
 
@@ -122,21 +120,17 @@ func UpdateUser(userInfo *model.User,newPassWord string) (*sql.Result,error) {
 
 	defer db.Close()
 
-	if newPassWord != nil{
-		hash := sha256.Sum256([]byte(newPassWord))
-		newPassWordHash := hex.EncodeToString(hash[:])
-		userInfo.PassHash = newPassWordHash
-	}
+	hash := sha256.Sum256([]byte(u.PassHash))
+	newPassWordHash := hex.EncodeToString(hash[:])
+	u.PassHash = newPassWordHash
 
-
-    // Convert hash to hexadecimal string
 
 	
 	res,err := db.Exec(
 	    `update User 
 		set userName = ?, userRole = ?, phoneNumber = ?, passwordHash = ?, nationalId = ?
 		where userId = ?`,
-		userInfo.Name,userInfo.Role,userInfo.Phone,userInfo.PassHash,userInfo.NationalId,userInfo.UserId,   
+		u.Name,u.Role,u.Phone,u.PassHash,u.NationalId,u.UserId,   
 	)
 
 	if err != nil{
@@ -147,7 +141,7 @@ func UpdateUser(userInfo *model.User,newPassWord string) (*sql.Result,error) {
 }
 
 
-func DeleteUser(userId int) (*sql.Result,error){
+func DeleteUser(nId int) (*sql.Result,error){
 	db,err := sql.Open("mysql",config.Dsn)
 
 	if err != nil{
@@ -159,8 +153,8 @@ func DeleteUser(userId int) (*sql.Result,error){
 	
 	res,err := db.Exec(
 	    `delete from User 
-		 where userId = ?`,
-		 userId,   
+		 where nationalId = ?`,
+		 nId,   
 	)
 
 	if err != nil{
@@ -197,7 +191,7 @@ func AllUser() (*[]model.User,error){
 
 	for res.Next(){
 		var u model.User
-		if err := res.Scan(&u.UserId,&u.CreateAt,&u.Name,&u.NationalId,&u.Phone,&u.PassHash,&u.Role);err!=nil{
+		if err := res.Scan(&u.UserId,&u.Name,&u.Role,&u.PassHash,&u.Phone,&u.CreateAt,&u.NationalId,);err!=nil{
 			return nil,err
 		}
 		users = append(users, u)
