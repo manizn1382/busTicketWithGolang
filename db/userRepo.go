@@ -11,7 +11,7 @@ import(
     "encoding/hex"
 )
 
-func AddUser(userName , phoneNumber string) (string) {
+func AddUser(u model.User) (string) {
 	db,err := sql.Open("mysql",config.Dsn)
 
 	if err != nil{
@@ -20,9 +20,16 @@ func AddUser(userName , phoneNumber string) (string) {
 
 	defer db.Close()
 
+	hash := sha256.Sum256([]byte(u.PassHash))
+	newPassWordHash := hex.EncodeToString(hash[:])
+	u.PassHash = newPassWordHash
+
 	res,err := db.Exec(
-		"insert into User (userName,phoneNumber,createTime) values (?, ?, ?)",
-	    userName,phoneNumber,time.Now(),
+		`insert into User 
+		(userName,phoneNumber,createTime,passwordHash,nationalId,userRole)
+		 values 
+		(?, ?, ?, ?, ?, ?)`,
+	    u.Name,u.Phone,time.Now(),u.PassHash,u.NationalId,u.Role,
 	)
 
 	if err != nil{
