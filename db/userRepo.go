@@ -10,9 +10,40 @@ import (
 	"tick/config"
 	"tick/model"
 	"time"
+	"regexp"
 )
 
+
+
+
+func UserValidation(u model.User) (error) {
+
+	nameV,_ := regexp.Compile(`[0-9a-zA-Z#$@]{20}`)
+	phoneV,_ := regexp.Compile(`\+98[0-9]{10}`)
+	nationalIdV,_ := regexp.Compile(`[0-9]{10}`)
+	RoleV,_ := regexp.Compile(`(?i)[admin|user|manager]`)
+
+	if !nameV.MatchString(u.Name){return errors.New("userName does not match the pattern")}
+	if !phoneV.MatchString(u.Phone){return errors.New("phoneNumber does not match the pattern")}
+	if !nationalIdV.MatchString(u.NationalId){return errors.New("national id does not match the pattern")}
+	if !RoleV.MatchString(u.Role){return errors.New("role does not match the pattern")}
+
+
+	return nil
+}
+
+
+
+
+
 func AddUser(u model.User) (string) {
+
+	
+	if e := UserValidation(u);e!=nil{
+		return e.Error()
+	}
+
+
 	db,err := sql.Open("mysql",config.Dsn)
 
 	if err != nil{
@@ -88,10 +119,17 @@ func GetUserByNationalId(nId string) (*model.User,error) {
 
 	userInfo := model.User{}
 
-	res := db.QueryRow(
-		"select * from User where nationalId = ?",
-		nId,
-	).Scan(
+	res := db.QueryRow("select * from User where nationalId = ?",nId)
+
+	var r int
+	rowErr := res.Scan(&r)
+	
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find user with this national id")
+	}
+	
+	
+	res.Scan(
 		&userInfo.UserId,
 		&userInfo.Name,
 		&userInfo.Role,
@@ -100,11 +138,6 @@ func GetUserByNationalId(nId string) (*model.User,error) {
 		&userInfo.CreateAt,
 		&userInfo.NationalId,
 	)
-
-
-	if res != nil{
-		return nil,res
-	}
 
 	
 	return &userInfo,nil
