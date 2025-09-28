@@ -1,1 +1,177 @@
 package db
+
+import (
+	"database/sql"
+	"errors"
+	"fmt"
+	"log"
+	"tick/config"
+	"tick/model"
+	"time"
+)
+
+func AddTicket(t model.Ticket) (string){
+
+	db,err := sql.Open("mysql",config.Dsn)
+
+	if err != nil{
+		fmt.Println("error opening db AddTicket: ",err)
+	}
+
+	defer db.Close()
+
+	res,err := db.Exec(
+		`insert into ticket
+		(tripId,userId,seatId,bookTime,stat)
+		values
+		(?,?,?,?,?)`,
+		t.TripId,t.UserId,t.SeatId,time.Now(),t.Status,
+	)
+
+	if err != nil{
+		log.Fatal(err)
+		return err.Error()
+	}
+
+	id,_ := res.LastInsertId()
+	return fmt.Sprintf("%s: %d","last insert id for ticket is: ",id) 
+
+}
+
+
+
+func GetTicketByTripId(tId int) (*model.Ticket,error){
+	db,err := sql.Open("mysql",config.Dsn)
+
+	if err != nil{
+		fmt.Println("error opening db in GetTicketByTripId : ",err)
+	}
+
+	defer db.Close()
+
+	ticketInfo := model.Ticket{}
+
+	res := db.QueryRow(
+		"select * from ticket where tripId = ?",
+		tId,
+	).Scan(
+		&ticketInfo.TicketId,
+		&ticketInfo.TripId,
+		&ticketInfo.UserId,
+		&ticketInfo.SeatId,
+		&ticketInfo.BookTime,
+		&ticketInfo.Status,
+	)
+
+
+	if res == nil{
+		return nil,errors.New("can't execute query with given tripId")
+	}
+
+	return &ticketInfo,nil
+
+}
+
+
+
+
+func UpdateTicket(t *model.Ticket) (*sql.Result,error) {
+
+	db,err := sql.Open("mysql",config.Dsn)
+
+	if err != nil{
+		fmt.Println("error opening db UpdateTicket: ",err)
+	}
+
+	defer db.Close()
+
+
+	
+	res,err := db.Exec(
+	    `update ticket 
+		set tripId = ?, userId = ?, seatId = ?, stat = ?
+		where ticketId = ?`,
+		t.TripId,t.UserId,t.SeatId,t.Status,t.TicketId,  
+	)
+
+	if err != nil{
+		log.Fatal(err)
+		return nil,errors.New("can't update ticket with these info")
+	}
+	return &res,nil
+}
+
+
+func DeleteTicket(ticketId int) (*sql.Result,error){
+	db,err := sql.Open("mysql",config.Dsn)
+
+	if err != nil{
+		fmt.Println("error opening db DeleteTicket: ",err)
+	}
+
+	defer db.Close()
+
+	
+	res,err := db.Exec(
+	    `delete from ticket 
+		 where ticketId = ?`,
+		 ticketId,   
+	)
+
+	if err!=nil{
+		return nil,errors.New("can't execute query for ticketId you give")
+	}
+
+	affect,err := res.RowsAffected()
+
+	if affect == 0{
+		return nil,errors.New("it doesn't exist ticket with this ticketId")
+	}
+
+	if err != nil{
+		log.Fatal(err)
+		return nil,err
+	}
+
+	return &res,err
+}
+
+
+func AllTicket() (*[]model.Ticket,error){
+
+	db,err := sql.Open("mysql",config.Dsn)
+
+	if err != nil{
+		fmt.Println("error opening db AllTicket: ",err)
+	}
+
+	defer db.Close()
+
+	res,err := db.Query(`select * from ticket`)
+
+	
+	if err != nil{
+		log.Fatal(err)
+		return nil,errors.New("can't execute query for AllTicket func")
+	}
+
+	defer res.Close()
+
+
+	var ticketList []model.Ticket
+
+
+	for res.Next(){
+		var t model.Ticket
+		if err := res.Scan(&t.TicketId,&t.TripId,&t.UserId,&t.SeatId,&t.BookTime,&t.Status,);err!=nil{
+			return nil,err
+		}
+		ticketList = append(ticketList, t)
+	}
+
+	return &ticketList,nil
+}
+
+
+
+
