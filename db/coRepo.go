@@ -7,9 +7,28 @@ import (
 	"log"
 	"tick/config"
 	"tick/model"
+	"regexp"
 )
 
+func companyValidation(c model.Company) (error) {
+
+	nameV,_ := regexp.Compile(`[a-zA-Z]{25}`)
+	phoneV,_ := regexp.Compile(`\+98[0-9]{10}`)
+
+	if !nameV.MatchString(c.Name){return errors.New("name does not match the pattern")}
+	if !phoneV.MatchString(c.SupportPhone){return errors.New("phone does not match the pattern")}
+
+
+	return nil
+}
+
+
+
 func AddCompany(c model.Company) (string){
+
+	if err:= companyValidation(c);err!=nil{
+		return err.Error()
+	}
 
 	db,err := sql.Open("mysql",config.Dsn)
 

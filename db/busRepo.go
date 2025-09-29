@@ -7,9 +7,30 @@ import (
 	"log"
 	"tick/config"
 	"tick/model"
+	"regexp"
 )
 
+
+
+
+func BusValidation(b model.Bus) (error) {
+
+	plateV,_ := regexp.Compile(`[0-9]{2}[A-Z][0-9]{5}`)
+	typeV,_ := regexp.Compile(`(?i)[normal|vip]`)
+
+	if !plateV.MatchString(b.PlateNumber){return errors.New("plateNumber does not match the pattern")}
+	if !typeV.MatchString(b.Type){return errors.New("type does not match the pattern")}
+
+
+	return nil
+}
+
+
 func AddBus(b model.Bus) (string){
+
+	if err := BusValidation(b);err != nil{
+		return err.Error()
+	}
 
 	db,err := sql.Open("mysql",config.Dsn)
 
