@@ -54,7 +54,17 @@ func GetTicketByTripId(tId int) (*model.Ticket,error){
 	res := db.QueryRow(
 		"select * from ticket where tripId = ?",
 		tId,
-	).Scan(
+	)
+	
+	var r int 
+	rowErr := res.Scan(&r)
+
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find ticket with this id")
+	}
+	
+	
+	res.Scan(
 		&ticketInfo.TicketId,
 		&ticketInfo.TripId,
 		&ticketInfo.UserId,
@@ -62,11 +72,6 @@ func GetTicketByTripId(tId int) (*model.Ticket,error){
 		&ticketInfo.BookTime,
 		&ticketInfo.Status,
 	)
-
-
-	if res == nil{
-		return nil,errors.New("can't execute query with given tripId")
-	}
 
 	return &ticketInfo,nil
 

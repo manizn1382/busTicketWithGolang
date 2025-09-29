@@ -51,7 +51,17 @@ func GetBusByPlateNumber(pNum string) (*model.Bus,error){
 	res := db.QueryRow(
 		"select * from Bus where plateNumber = ?",
 		pNum,
-	).Scan(
+	)
+
+	var r int
+	rowErr := res.Scan(&r)
+
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find bus with this plate number")
+	}
+	
+	
+	res.Scan(
 		&busInfo.BusId,
 		&busInfo.PlateNumber,
 		&busInfo.Capacity,
@@ -59,11 +69,6 @@ func GetBusByPlateNumber(pNum string) (*model.Bus,error){
 		&busInfo.Type,
 		&busInfo.CompanyId,
 	)
-
-
-	if res != nil{
-		return nil,res
-	}
 
 	return &busInfo,nil
 

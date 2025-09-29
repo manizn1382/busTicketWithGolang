@@ -53,7 +53,17 @@ func GetTripById(tId int) (*model.Trip,error){
 	res := db.QueryRow(
 		"select * from trip where tripId = ?",
 		tId,
-	).Scan(
+	)
+	
+	var r int
+
+	rowErr := res.Scan(&r)
+
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find trip with this trip id")
+	}
+	
+	res.Scan(
 		&tripInfo.TripId,
 		&tripInfo.Origin,
 		&tripInfo.Dest,
@@ -63,11 +73,6 @@ func GetTripById(tId int) (*model.Trip,error){
 		&tripInfo.Status,
 		&tripInfo.Distance,
 	)
-
-
-	if res == nil{
-		return nil,errors.New("can't execute query with given tripId")
-	}
 
 	return &tripInfo,nil
 

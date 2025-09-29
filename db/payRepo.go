@@ -54,7 +54,18 @@ func GetPayByTicketId(tId int) (*model.Payment,error){
 	res := db.QueryRow(
 		"select * from payment where ticketId = ?",
 		tId,
-	).Scan(
+	)
+
+	var r int
+	rowErr := res.Scan(&r)
+
+
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find payment by this ticket id")
+	}
+	
+	
+	res.Scan(
 		&payInfo.PaymentId,
 		&payInfo.TicketId,
 		&payInfo.Amount,
@@ -62,11 +73,6 @@ func GetPayByTicketId(tId int) (*model.Payment,error){
 		&payInfo.PayStatus,
 		&payInfo.CreateAt,
 	)
-
-
-	if res == nil{
-		return nil,errors.New("can't execute query with given ticketId")
-	}
 
 	return &payInfo,nil
 

@@ -51,18 +51,23 @@ func GetSeatById(Id string) (*model.Seat,error){
 	res := db.QueryRow(
 		"select * from seats where seatId = ?",
 		Id,
-	).Scan(
+	)
+
+	var r int
+	rowErr := res.Scan(&r)
+
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find seat with this id")
+	}
+	
+	
+	res.Scan(
 		&SeatInfo.SeatId,
 		&SeatInfo.BusId,
 		&SeatInfo.SeatNum,
 		&SeatInfo.Status,
 		&SeatInfo.Description,
 	)
-
-
-	if res != nil{
-		return nil,errors.New("can't execute query for get seat")
-	}
 
 	return &SeatInfo,nil
 

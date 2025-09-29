@@ -85,10 +85,23 @@ func GetUserByPhone(phoneNumber string) (*model.User,error){
 
 	userInfo := model.User{}
 
+	 
+
+
 	res := db.QueryRow(
 		"select * from User where phoneNumber = ?",
 		phoneNumber,
-	).Scan(
+	)
+	
+	var r int
+	rowErr := res.Scan(&r)
+
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find user with this phone Number")
+	}
+	
+	
+	res.Scan(
 		&userInfo.UserId,
 		&userInfo.Name,
 		&userInfo.Role,
@@ -97,11 +110,6 @@ func GetUserByPhone(phoneNumber string) (*model.User,error){
 		&userInfo.CreateAt,
 		&userInfo.NationalId,
 	)
-
-
-	if res != nil{
-		return nil,res
-	}
 
 	return &userInfo,nil
 

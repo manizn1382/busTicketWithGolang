@@ -51,17 +51,22 @@ func GetCompanyByPhone(phone string) (*model.Company,error){
 	res := db.QueryRow(
 		"select * from company where supportPhone = ?",
 		phone,
-	).Scan(
+	)
+
+	var r int
+	rowErr := res.Scan(&r)
+
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find dompany with this phoneNumber")
+	}
+	
+	
+	res.Scan(
 		&coInfo.CompanyId,
 		&coInfo.Name,
 		&coInfo.SupportPhone,
 		&coInfo.Address,
 	)
-
-
-	if res != nil{
-		return nil,res
-	}
 
 	return &coInfo,nil
 
