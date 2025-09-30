@@ -7,4 +7,5 @@ type Bus struct{
 	TripId int
 	Type string
 	CompanyId int
+	Status string
 }

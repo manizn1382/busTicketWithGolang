@@ -17,9 +17,11 @@ func BusValidation(b model.Bus) (error) {
 
 	plateV,_ := regexp.Compile(`[0-9]{2}[A-Z][0-9]{5}`)
 	typeV,_ := regexp.Compile(`(?i)[normal|vip]`)
+	statusV,_ := regexp.Compile(`(?i)[open|close]`)
 
 	if !plateV.MatchString(b.PlateNumber){return errors.New("plateNumber does not match the pattern")}
 	if !typeV.MatchString(b.Type){return errors.New("type does not match the pattern")}
+	if !statusV.MatchString(b.Status){return errors.New("BusStatus does not match the pattern")}
 
 
 	return nil
@@ -89,6 +91,7 @@ func GetBusByPlateNumber(pNum string) (*model.Bus,error){
 		&busInfo.TripId,
 		&busInfo.Type,
 		&busInfo.CompanyId,
+		&busInfo.Status,
 	)
 
 	return &busInfo,nil
@@ -110,9 +113,9 @@ func UpdateBus(b *model.Bus) (*sql.Result,error) {
 	
 	res,err := db.Exec(
 	    `update bus 
-		set plateNumber = ?, capacity = ?, tripId = ?, busType = ?, coId = ?
+		set plateNumber = ?, capacity = ?, tripId = ?, busType = ?, coId = ?, status = ?
 		where busId = ?`,
-		b.PlateNumber,b.Capacity,b.TripId,b.Type,b.CompanyId,b.BusId,   
+		b.PlateNumber,b.Capacity,b.TripId,b.Type,b.CompanyId,b.BusId,b.Status,   
 	)
 
 	if err != nil{
@@ -184,7 +187,7 @@ func AllBus() (*[]model.Bus,error){
 
 	for res.Next(){
 		var b model.Bus
-		if err := res.Scan(&b.BusId,&b.PlateNumber,&b.Capacity,&b.TripId,&b.Type,&b.CompanyId,);err!=nil{
+		if err := res.Scan(&b.BusId,&b.PlateNumber,&b.Capacity,&b.TripId,&b.Type,&b.CompanyId,&b.Status);err!=nil{
 			return nil,err
 		}
 		busList = append(busList, b)
