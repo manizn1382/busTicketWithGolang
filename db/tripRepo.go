@@ -7,9 +7,31 @@ import (
 	"log"
 	"tick/config"
 	"tick/model"
+	"regexp"
 )
 
+func TripValidation(t model.Trip) (error) {
+
+	statusV,_ := regexp.Compile(`(?i)[closed|open]`)
+	originV,_ := regexp.Compile(`^[a-zA-Z]{1,30}`)
+	destV,_ := regexp.Compile(`^[a-zA-Z]{1,30}`)
+
+	if !statusV.MatchString(t.Status){return errors.New("status does not match the pattern")}
+	if !originV.MatchString(t.Origin){return errors.New("origin does not match the pattern")}
+	if !destV.MatchString(t.Dest){return errors.New("dest does not match the pattern")}
+
+
+	return nil
+}
+
+
 func AddTrip(t model.Trip) (string){
+
+
+
+	if err := TripValidation(t);err != nil{
+		return err.Error()
+	}
 
 	db,err := sql.Open("mysql",config.Dsn)
 

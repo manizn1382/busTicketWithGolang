@@ -12,7 +12,7 @@ import (
 
 func companyValidation(c model.Company) (error) {
 
-	nameV,_ := regexp.Compile(`[a-zA-Z]{25}`)
+	nameV,_ := regexp.Compile(`^[a-zA-Z]{1,25}`)
 	phoneV,_ := regexp.Compile(`\+98[0-9]{10}`)
 
 	if !nameV.MatchString(c.Name){return errors.New("name does not match the pattern")}

@@ -8,9 +8,27 @@ import (
 	"tick/config"
 	"tick/model"
 	"time"
+	"regexp"
 )
 
+func TicketValidation(t model.Ticket) (error) {
+
+	statusV,_ := regexp.Compile(`(?i)[reserved|available]`)
+
+	if !statusV.MatchString(t.Status){return errors.New("status does not match the pattern")}
+
+
+	return nil
+}
+
+
+
 func AddTicket(t model.Ticket) (string){
+
+	if err := TicketValidation(t);err!=nil{
+		return err.Error()
+	}
+
 
 	db,err := sql.Open("mysql",config.Dsn)
 

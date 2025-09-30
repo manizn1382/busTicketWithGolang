@@ -8,9 +8,28 @@ import (
 	"tick/config"
 	"tick/model"
 	"time"
+	"regexp"
 )
 
+func PayValidation(p model.Payment) (error) {
+
+	typeV,_ := regexp.Compile(`(?i)[card|cash]`)
+	statusV,_ := regexp.Compile(`(?i)[complete|inProgress|failed]`)
+
+	if !typeV.MatchString(p.PayType){return errors.New("pay type does not match the pattern")}
+	if !statusV.MatchString(p.PayStatus){return errors.New("status does not match the pattern")}
+
+
+	return nil
+}
+
+
 func AddPayment(p model.Payment) (string){
+
+	if err:= PayValidation(p);err!=nil{
+		return err.Error()
+	}
+
 
 	db,err := sql.Open("mysql",config.Dsn)
 

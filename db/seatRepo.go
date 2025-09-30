@@ -7,9 +7,28 @@ import (
 	"log"
 	"tick/config"
 	"tick/model"
+	"regexp"
 )
 
+
+func SeatValidation(s model.Seat) (error) {
+
+	statusV,_ := regexp.Compile(`(?i)[reserve|free]`)
+
+	if !statusV.MatchString(s.Status){return errors.New("status does not match the pattern")}
+
+
+	return nil
+}
+
+
+
 func AddSeat(s model.Seat) (string){
+
+
+	if err := SeatValidation(s);err!=nil{
+		return err.Error()
+	} 
 
 	db,err := sql.Open("mysql",config.Dsn)
 
