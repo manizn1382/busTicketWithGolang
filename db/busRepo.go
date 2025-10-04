@@ -28,21 +28,21 @@ func BusValidation(b model.Bus) (error) {
 }
 
 
-func AddBus(b model.Bus) (string){
+func AddBus(b model.Bus) (error){
 
 	if err := BusValidation(b);err != nil{
-		return err.Error()
+		return errors.New("bus validation have error")
 	}
 
 	db,err := sql.Open("mysql",config.Dsn)
 
 	if err != nil{
-		fmt.Println("error opening db AddBus: ",err)
+		return errors.New("error opening db AddBus")
 	}
 
 	defer db.Close()
 
-	res,err := db.Exec(
+	_,err = db.Exec(
 		`insert into bus 
 		(plateNumber,capacity,busType,coId)
 		values
@@ -51,12 +51,10 @@ func AddBus(b model.Bus) (string){
 	)
 
 	if err != nil{
-		log.Fatal(err)
-		return err.Error()
+		return errors.New("can't execute query")
 	}
 
-	id,_ := res.LastInsertId()
-	return fmt.Sprintf("%s: %d","last insert id for bus is: ",id) 
+	return nil 
 
 }
 
