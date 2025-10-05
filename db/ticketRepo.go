@@ -23,22 +23,22 @@ func TicketValidation(t model.Ticket) (error) {
 
 
 
-func AddTicket(t model.Ticket) (string){
+func AddTicket(t model.Ticket) (error){
 
 	if err := TicketValidation(t);err!=nil{
-		return err.Error()
+		return err
 	}
 
 
 	db,err := sql.Open("mysql",config.Dsn)
 
 	if err != nil{
-		fmt.Println("error opening db AddTicket: ",err)
+		return err
 	}
 
 	defer db.Close()
 
-	res,err := db.Exec(
+	_,err = db.Exec(
 		`insert into ticket
 		(tripId,userId,seatId,bookTime,stat)
 		values
@@ -47,12 +47,11 @@ func AddTicket(t model.Ticket) (string){
 	)
 
 	if err != nil{
-		log.Fatal(err)
-		return err.Error()
+		return err
 	}
 
-	id,_ := res.LastInsertId()
-	return fmt.Sprintf("%s: %d","last insert id for ticket is: ",id) 
+	//id,_ := res.LastInsertId()
+	return nil 
 
 }
 

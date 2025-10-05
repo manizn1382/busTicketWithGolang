@@ -25,23 +25,23 @@ func TripValidation(t model.Trip) (error) {
 }
 
 
-func AddTrip(t model.Trip) (string){
+func AddTrip(t model.Trip) (error){
 
 
 
 	if err := TripValidation(t);err != nil{
-		return err.Error()
+		return err
 	}
 
 	db,err := sql.Open("mysql",config.Dsn)
 
 	if err != nil{
-		fmt.Println("error opening db AddTrip: ",err)
+		return err
 	}
 
 	defer db.Close()
 
-	res,err := db.Exec(
+	_,err = db.Exec(
 		`insert into trip
 		(origin,dest,departureTime,arrivalTime,price,stat,distance)
 		values
@@ -50,12 +50,11 @@ func AddTrip(t model.Trip) (string){
 	)
 
 	if err != nil{
-		log.Fatal(err)
-		return err.Error()
+		return err
 	}
 
-	id,_ := res.LastInsertId()
-	return fmt.Sprintf("%s: %d","last insert id for trip is: ",id) 
+	//id,_ := res.LastInsertId()
+	return err 
 
 }
 

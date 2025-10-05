@@ -36,18 +36,18 @@ func UserValidation(u model.User) (error) {
 
 
 
-func AddUser(u model.User) (string) {
+func AddUser(u model.User) (error) {
 
 	
 	if e := UserValidation(u);e!=nil{
-		return e.Error()
+		return e
 	}
 
 
 	db,err := sql.Open("mysql",config.Dsn)
 
 	if err != nil{
-		fmt.Println(err)
+		return err
 	}
 
 	defer db.Close()
@@ -56,7 +56,7 @@ func AddUser(u model.User) (string) {
 	newPassWordHash := hex.EncodeToString(hash[:])
 	u.PassHash = newPassWordHash
 
-	res,err := db.Exec(
+	_,err = db.Exec(
 		`insert into User 
 		(userName,phoneNumber,createTime,passwordHash,nationalId,userRole)
 		 values 
@@ -65,11 +65,11 @@ func AddUser(u model.User) (string) {
 	)
 
 	if err != nil{
-		log.Fatal(err)
+		return err
 	}
 
-	id,_ := res.LastInsertId()
-	return fmt.Sprintf("%s: %d","last insert id for user is: ",id) 
+	//id,_ := res.LastInsertId()
+	return nil 
 
 }
 

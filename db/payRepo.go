@@ -24,22 +24,22 @@ func PayValidation(p model.Payment) (error) {
 }
 
 
-func AddPayment(p model.Payment) (string){
+func AddPayment(p model.Payment) (error){
 
 	if err:= PayValidation(p);err!=nil{
-		return err.Error()
+		return err
 	}
 
 
 	db,err := sql.Open("mysql",config.Dsn)
 
 	if err != nil{
-		fmt.Println("error opening db AddPayment: ",err)
+		return err
 	}
 
 	defer db.Close()
 
-	res,err := db.Exec(
+	_,err = db.Exec(
 		`insert into  payment
 		(ticketId,amount,payType,payStatus,createdAt)
 		values
@@ -48,12 +48,11 @@ func AddPayment(p model.Payment) (string){
 	)
 
 	if err != nil{
-		log.Fatal(err)
-		return err.Error()
+		return err
 	}
 
-	id,_ := res.LastInsertId()
-	return fmt.Sprintf("%s: %d","last insert id for payment is: ",id) 
+	// id,_ := res.LastInsertId()
+	return nil 
 
 }
 

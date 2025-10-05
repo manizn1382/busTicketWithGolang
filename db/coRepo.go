@@ -24,21 +24,21 @@ func companyValidation(c model.Company) (error) {
 
 
 
-func AddCompany(c model.Company) (string){
+func AddCompany(c model.Company) (error){
 
 	if err:= companyValidation(c);err!=nil{
-		return err.Error()
+		return err
 	}
 
 	db,err := sql.Open("mysql",config.Dsn)
 
 	if err != nil{
-		fmt.Println("error opening db AddCompany: ",err)
+		return err
 	}
 
 	defer db.Close()
 
-	res,err := db.Exec(
+	_,err = db.Exec(
 		`insert into company 
 		(coName,supportPhone,coAddress)
 		values
@@ -47,12 +47,11 @@ func AddCompany(c model.Company) (string){
 	)
 
 	if err != nil{
-		log.Fatal(err)
-		return err.Error()
+		return err
 	}
 
-	id,_ := res.LastInsertId()
-	return fmt.Sprintf("%s: %d","last insert id for company is: ",id) 
+	// id,_ := res.LastInsertId()
+	return nil 
 
 }
 
