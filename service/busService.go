@@ -33,6 +33,50 @@ func AddBus(r *http.Request, w http.ResponseWriter) {
 }
 
 func BindBusToTrip(r *http.Request, w http.ResponseWriter) {
+	
+	r.ParseForm()
+	plateNumber := r.FormValue("plate")
+	tripdId,_ := strconv.Atoi(r.FormValue("trip"))
+
+	busInfo,err := db.GetBusByPlateNumber(plateNumber)
+
+	if err != nil{
+		w.Write([]byte("it doesn't exist bus with this plate number"))
+		w.WriteHeader(404)
+	}else{
+		busInfo.TripId = tripdId
+		_,err := db.UpdateBus(busInfo)
+		if err != nil{
+			w.Write([]byte("can't update with this tripId"))
+			w.WriteHeader(500)
+		}else{
+			w.Write([]byte("success"))
+			w.WriteHeader(200)
+		}
+	}
+
 }
 
-func BindBusToCompany(r *http.Request, w http.ResponseWriter) {}
+func BindBusToCompany(r *http.Request, w http.ResponseWriter) {
+	
+	r.ParseForm()
+	plateNumber := r.FormValue("plate")
+	coId,_ := strconv.Atoi(r.FormValue("company"))
+
+	busInfo,err := db.GetBusByPlateNumber(plateNumber)
+
+	if err != nil{
+		w.Write([]byte("it doesn't exist bus with this plate number"))
+		w.WriteHeader(404)
+	}else{
+		busInfo.CompanyId = coId
+		_,err := db.UpdateBus(busInfo)
+		if err != nil{
+			w.Write([]byte("can't update with this coId"))
+			w.WriteHeader(500)
+		}else{
+			w.Write([]byte("success"))
+			w.WriteHeader(200)
+		}
+	}
+}

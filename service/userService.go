@@ -34,8 +34,6 @@ func SignIn(r *http.Request, w http.ResponseWriter) {
 		w.WriteHeader(200)	
 	}
 
-	
-
 }
 
 
@@ -99,7 +97,6 @@ func EditProfile(r *http.Request, w http.ResponseWriter) {
 			w.WriteHeader(200)
 		}
 	}
-
 	
 }
 
