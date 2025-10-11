@@ -91,6 +91,42 @@ func GetSeatById(Id string) (*model.Seat,error){
 
 }
 
+func GetSeatByNumber(sNum string) (*model.Seat,error){
+	db,err := sql.Open("mysql",config.Dsn)
+
+	if err != nil{
+		fmt.Println("error opening db in GetSeatByNumber : ",err)
+	}
+
+	defer db.Close()
+
+	SeatInfo := model.Seat{}
+
+	res := db.QueryRow(
+		"select * from seats where seatNum = ?",
+		sNum,
+	)
+
+	var r int
+	rowErr := res.Scan(&r)
+
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find seat with this seat Number")
+	}
+	
+	
+	res.Scan(
+		&SeatInfo.SeatId,
+		&SeatInfo.BusId,
+		&SeatInfo.SeatNum,
+		&SeatInfo.Status,
+		&SeatInfo.Description,
+	)
+
+	return &SeatInfo,nil
+
+}
+
 
 func UpdateSeat(s *model.Seat) (*sql.Result,error) {
 
