@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+
 	"github.com/joho/godotenv"
 )
 
@@ -12,6 +13,7 @@ var DBPass string
 var DBHost string
 var DBPort string
 var DBName string
+var RefTime string
 var Dsn    string
 
 func SetEnv() {
@@ -28,5 +30,6 @@ func SetEnv() {
         DBPort = os.Getenv("port")
         DBName = os.Getenv("dbName")
         Dsn = os.Getenv("dsn")
+        RefTime = os.Getenv("refTime")
 
 }
