@@ -1,12 +1,13 @@
 package service
 
 import (
+	"encoding/json"
 	"net/http"
+	"strconv"
+	"tick/config"
 	"tick/db"
 	"tick/model"
 	"time"
-	"tick/config"
-	"strconv"
 )
 
 func SetTrip(r *http.Request,w http.ResponseWriter) {
@@ -45,12 +46,118 @@ func SetTrip(r *http.Request,w http.ResponseWriter) {
 
 }
 
-func SearchByOrigin() {}
+func SearchByOrigin(r *http.Request,w http.ResponseWriter) {
+	org := r.URL.Query().Get("origin")
+	tripInfo,err := db.GetTripByOrigin(org)
 
-func SearchByDest() {}
+	if err != nil{
+		w.Write([]byte("trip doesn't exist"))
+		w.WriteHeader(404)
+	}else{
+		tripInfo,err := json.Marshal(tripInfo)
 
-func SearchByDate() {}
+		if err != nil{
+			w.Write([]byte("error in parsing json"))
+			w.WriteHeader(500)
+		}else{
+			w.Write(tripInfo)
+			w.WriteHeader(200)
+		}
+	}
+}
 
-func ChangeStatus() {}
+func SearchByDest(r *http.Request,w http.ResponseWriter) {
+	dest := r.URL.Query().Get("destination")
+	tripInfo,err := db.GetTripByDest(dest)
 
-func ViewTripInfo() {}
+	if err != nil{
+		w.Write([]byte("trip doesn't exist"))
+		w.WriteHeader(404)
+	}else{
+		tripInfo,err := json.Marshal(tripInfo)
+
+		if err != nil{
+			w.Write([]byte("error in parsing json"))
+			w.WriteHeader(500)
+		}else{
+			w.Write(tripInfo)
+			w.WriteHeader(200)
+		}
+	}
+}
+
+func SearchByDate(r *http.Request,w http.ResponseWriter) {
+	date := r.URL.Query().Get("date")
+	tripInfo,err := db.GetTripByDate(date)
+
+	if err != nil{
+		w.Write([]byte("trip doesn't exist"))
+		w.WriteHeader(404)
+	}else{
+		tripInfo,err := json.Marshal(tripInfo)
+
+		if err != nil{
+			w.Write([]byte("error in parsing json"))
+			w.WriteHeader(500)
+		}else{
+			w.Write(tripInfo)
+			w.WriteHeader(200)
+		}
+	}
+}
+
+func ChangeStatus(r *http.Request,w http.ResponseWriter) {
+	 r.ParseForm()
+	 tripId,errId := strconv.Atoi(r.FormValue("Id"))
+	 if errId != nil{
+		w.Write([]byte("can't convert Id to int"))
+		w.WriteHeader(500)
+	 }else{
+		 status := r.FormValue("stat")
+		 tripInfo,err := db.GetTripById(tripId)
+		 if err != nil{
+			w.Write([]byte("can't find trip with this id"))
+			w.WriteHeader(404)
+		 }else{
+			tripInfo.Status = status
+			_,err := db.UpdateTrip(tripInfo)
+			if err != nil{
+				w.Write([]byte("can't update trip with this id"))
+				w.WriteHeader(500)
+			}else{
+				w.Write([]byte("success"))
+				w.WriteHeader(200)
+			}
+
+		 }
+
+	 }
+
+}
+
+func ViewTripInfo(r *http.Request,w http.ResponseWriter) {
+	tripId := r.URL.Query().Get("tripId")
+	Id,errId := strconv.Atoi(tripId)
+	if errId != nil{
+		w.Write([]byte("can't parse id"))
+		w.WriteHeader(500)
+	}else{
+		trip,err := db.GetTripById(Id)
+	
+		if err != nil{
+			w.Write([]byte("trip Not Found"))
+			w.WriteHeader(404)
+		}else{
+			res,err := json.Marshal(trip)
+	
+			if err != nil{
+				w.Write([]byte("can't parse data to json"))
+				w.WriteHeader(500)
+			}else{
+				w.Write(res)
+				w.WriteHeader(200)
+			}
+		}
+	}
+
+}

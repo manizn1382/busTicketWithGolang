@@ -100,6 +100,111 @@ func GetTripById(tId int) (*model.Trip,error){
 }
 
 
+func GetTripByOrigin(origin string) (*[]model.Trip,error){
+	db,err := sql.Open("mysql",config.Dsn)
+
+	if err != nil{
+		fmt.Println("error opening db in GetTripByOrigin : ",err)
+	}
+
+	defer db.Close()
+
+
+	res,err := db.Query(
+		"select * from trip where origin = ?",
+		origin,
+	)
+	if err != nil{
+		log.Fatal(err)
+		return nil,errors.New("can't execute query for GetTripByOrigin func")
+	}
+
+	defer res.Close()
+
+	var tripList []model.Trip
+
+	for res.Next(){
+		var t model.Trip
+		if err := res.Scan(&t.TripId,&t.Origin,&t.Dest,&t.DepartureTime,&t.ArrivalTime,&t.Price,&t.Status,&t.Distance);err!=nil{
+			return nil,err
+		}
+		tripList = append(tripList, t)
+	}
+
+	return &tripList,nil
+
+}
+
+func GetTripByDest(dest string) (*[]model.Trip,error){
+	db,err := sql.Open("mysql",config.Dsn)
+
+	if err != nil{
+		fmt.Println("error opening db in GetTripByDest : ",err)
+	}
+
+	defer db.Close()
+
+
+	res,err := db.Query(
+		"select * from trip where dest = ?",
+		dest,
+	)
+	if err != nil{
+		log.Fatal(err)
+		return nil,errors.New("can't execute query for GetTripByDest func")
+	}
+
+	defer res.Close()
+
+	var tripList []model.Trip
+
+	for res.Next(){
+		var t model.Trip
+		if err := res.Scan(&t.TripId,&t.Origin,&t.Dest,&t.DepartureTime,&t.ArrivalTime,&t.Price,&t.Status,&t.Distance);err!=nil{
+			return nil,err
+		}
+		tripList = append(tripList, t)
+	}
+
+	return &tripList,nil
+
+}
+
+func GetTripByDate(date string) (*[]model.Trip,error){
+	db,err := sql.Open("mysql",config.Dsn)
+
+	if err != nil{
+		fmt.Println("error opening db in GetTripByDate : ",err)
+	}
+
+	defer db.Close()
+
+
+	res,err := db.Query(
+		"select * from trip where departureTime = ?",
+		date,
+	)
+	if err != nil{
+		log.Fatal(err)
+		return nil,errors.New("can't execute query for GetTripByDate func")
+	}
+
+	defer res.Close()
+
+	var tripList []model.Trip
+
+	for res.Next(){
+		var t model.Trip
+		if err := res.Scan(&t.TripId,&t.Origin,&t.Dest,&t.DepartureTime,&t.ArrivalTime,&t.Price,&t.Status,&t.Distance);err!=nil{
+			return nil,err
+		}
+		tripList = append(tripList, t)
+	}
+
+	return &tripList,nil
+
+}
+
 
 
 func UpdateTrip(t *model.Trip) (*sql.Result,error) {
