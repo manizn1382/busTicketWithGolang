@@ -97,9 +97,48 @@ func GetPayByTicketId(tId int) (*model.Payment,error){
 }
 
 
+func GetPayById(Id int) (*model.Payment,error){
+	db,err := sql.Open("mysql",config.Dsn)
+
+	if err != nil{
+		fmt.Println("error opening db in GetPayById : ",err)
+	}
+
+	defer db.Close()
+
+	payInfo := model.Payment{}
+
+	res := db.QueryRow(
+		"select * from payment where payId = ?",
+		Id,
+	)
+
+	var r int
+	rowErr := res.Scan(&r)
 
 
-func UpdatePayment(p *model.Payment) (*sql.Result,error) {
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find payment by this id")
+	}
+	
+	
+	res.Scan(
+		&payInfo.PaymentId,
+		&payInfo.TicketId,
+		&payInfo.Amount,
+		&payInfo.PayType,
+		&payInfo.PayStatus,
+		&payInfo.CreateAt,
+	)
+
+	return &payInfo,nil
+
+}
+
+
+
+
+func UpdatePayment(p model.Payment) (*sql.Result,error) {
 
 	db,err := sql.Open("mysql",config.Dsn)
 
