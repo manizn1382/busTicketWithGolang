@@ -77,6 +77,44 @@ func GetTicketByTripId(tId int) (*model.Ticket,error){
 	rowErr := res.Scan(&r)
 
 	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find ticket with this trip id")
+	}
+	
+	
+	res.Scan(
+		&ticketInfo.TicketId,
+		&ticketInfo.TripId,
+		&ticketInfo.UserId,
+		&ticketInfo.SeatId,
+		&ticketInfo.BookTime,
+		&ticketInfo.Status,
+	)
+
+	return &ticketInfo,nil
+
+}
+
+
+func GetTicketById(tId int) (*model.Ticket,error){
+	db,err := sql.Open("mysql",config.Dsn)
+
+	if err != nil{
+		fmt.Println("error opening db in GetTicketById : ",err)
+	}
+
+	defer db.Close()
+
+	ticketInfo := model.Ticket{}
+
+	res := db.QueryRow(
+		"select * from ticket where ticketId = ?",
+		tId,
+	)
+	
+	var r int 
+	rowErr := res.Scan(&r)
+
+	if rowErr == sql.ErrNoRows{
 		return nil,errors.New("can't find ticket with this id")
 	}
 	
