@@ -80,6 +80,7 @@ func RefundPrice(r *http.Request, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+
 	tripInfo, err := db.GetTripById(ticketInfo.TripId)
 
 	if err != nil {
@@ -88,20 +89,55 @@ func RefundPrice(r *http.Request, w http.ResponseWriter) {
 		return
 	}
 
+	seatInfo,err := db.GetSeatById(ticketInfo.SeatId)
+
+	if err != nil{
+		w.Write([]byte("can't find seat with this seat id"))
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+
 	refPercent := calculateRefundPercent(tripInfo)
 
 	refAmount := payInfo.Amount * refPercent
 
 	PayToUser(ticketInfo.UserId, refAmount)
 
+
 	payInfo.PayStatus = "Canceled"
-	ticketInfo.Status = "available"
+	ticketInfo.Status = "canceled"
+	seatInfo.Status = "free"
 	
 
-	db.UpdatePayment(*payInfo)
-	db.UpdateTicket()
+	_,err = db.UpdatePayment(*payInfo)
+
+	if err != nil{
+		w.Write([]byte("can't update pay with this info in refund price"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 
+	_,err = db.UpdateTicket(ticketInfo)
+
+	if err != nil{
+		w.Write([]byte("can't update ticket with this info in refund price"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_,err = db.UpdateSeat(seatInfo)
+
+	if err != nil{
+		w.Write([]byte("can't update seat with this info in refund price"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte("refund process paid successfully"))
+	w.WriteHeader(http.StatusAccepted)
+	
 }
 
 func PayToUser(uId int, amount float32) {}

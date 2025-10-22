@@ -55,7 +55,7 @@ func AddSeat(s model.Seat) (error){
 
 }
 
-func GetSeatById(Id string) (*model.Seat,error){
+func GetSeatById(Id int) (*model.Seat,error){
 	db,err := sql.Open("mysql",config.Dsn)
 
 	if err != nil{

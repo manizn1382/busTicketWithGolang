@@ -13,7 +13,7 @@ import (
 
 func TicketValidation(t model.Ticket) (error) {
 
-	statusV,_ := regexp.Compile(`(?i)[reserved|available]`)
+	statusV,_ := regexp.Compile(`(?i)[reserved|available|canceled]`)
 
 	if !statusV.MatchString(t.Status){return errors.New("status does not match the pattern")}
 
