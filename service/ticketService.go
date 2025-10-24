@@ -126,5 +126,31 @@ func CancelTicket(r *http.Request, w http.ResponseWriter){
 }
 
 func ViewUserTicketsHis(r *http.Request, w http.ResponseWriter){
-	
+	var user model.User
+
+	if err := json.NewDecoder(r.Body).Decode(&user);err!=nil{
+		w.Write([]byte("can't update seat in viewUserTicketHis func."))
+		w.WriteHeader(http.StatusConflict)
+		return
+	}
+
+	ticketList,err := db.GetUserTicketHis(user.UserId)
+
+	if err != nil{
+		w.Write([]byte("can't find ticket in viewUserTicketHis func."))
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	ticketListJson,err := json.Marshal(ticketList)
+
+	if err != nil{
+		w.Write([]byte("can't parse ticketList into json in viewUserTicketHis func."))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(ticketListJson)
+	w.WriteHeader(http.StatusConflict)
+
 }

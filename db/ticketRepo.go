@@ -133,8 +133,6 @@ func GetTicketById(tId int) (*model.Ticket,error){
 }
 
 
-
-
 func UpdateTicket(t *model.Ticket) (*sql.Result,error) {
 
 	db,err := sql.Open("mysql",config.Dsn)
@@ -213,6 +211,40 @@ func AllTicket() (*[]model.Ticket,error){
 	if err != nil{
 		log.Fatal(err)
 		return nil,errors.New("can't execute query for AllTicket func")
+	}
+
+	defer res.Close()
+
+
+	var ticketList []model.Ticket
+
+
+	for res.Next(){
+		var t model.Ticket
+		if err := res.Scan(&t.TicketId,&t.TripId,&t.UserId,&t.SeatId,&t.BookTime,&t.Status,);err!=nil{
+			return nil,err
+		}
+		ticketList = append(ticketList, t)
+	}
+
+	return &ticketList,nil
+}
+
+func GetUserTicketHis(uid int) (*[]model.Ticket,error){
+	db,err := sql.Open("mysql",config.Dsn)
+
+	if err != nil{
+		fmt.Println("error opening db GetUserTicketHis: ",err)
+	}
+
+	defer db.Close()
+
+	res,err := db.Query(`select * from ticket where userId = ?`,uid,)
+
+	
+	if err != nil{
+		log.Fatal(err)
+		return nil,errors.New("can't execute query for GetUserTicketHis func")
 	}
 
 	defer res.Close()

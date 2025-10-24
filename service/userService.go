@@ -19,8 +19,9 @@ func SignIn(r *http.Request, w http.ResponseWriter) {
 	user,err := db.GetUserByPhone(phone)
 
 	if err != nil{
-		w.Write([]byte(err.Error()))
-		w.WriteHeader(204)
+		w.Write([]byte("can't find user with this info"))
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	hash := sha256.Sum256([]byte(passWord))
@@ -28,12 +29,12 @@ func SignIn(r *http.Request, w http.ResponseWriter) {
 	
 	if PassWordHash != user.PassHash{
 		w.Write([]byte("password is incorrect"))
-		w.WriteHeader(204)
-	}else{
-		w.Write([]byte("ok"))
-		w.WriteHeader(200)	
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
-
+	w.Write([]byte("success"))
+	w.WriteHeader(http.StatusAccepted)	
+	
 }
 
 
@@ -56,12 +57,13 @@ func SignUp(r *http.Request, w http.ResponseWriter) {
 	resp := db.AddUser(userInfo)
 
 	if resp != nil{
-		w.Write([]byte("can't signUp"))
-		w.WriteHeader(204)
+		w.Write([]byte("signUp failed"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	w.Write([]byte("ok"))
-	w.WriteHeader(200)
+	w.Write([]byte("success"))
+	w.WriteHeader(http.StatusAccepted)
 
 }
 
