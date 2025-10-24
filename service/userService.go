@@ -76,9 +76,10 @@ func EditProfile(r *http.Request, w http.ResponseWriter) {
 	userId,err := strconv.Atoi(r.FormValue("Id"))
 
 	if err != nil{
-		w.Write([]byte("can't convert Id to int"))
-		w.WriteHeader(204)
-	}else{
+		w.Write([]byte("can't convert Id to int in editProfile"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 		userInfo := model.User{
 		Name: r.FormValue("userName"),
@@ -89,16 +90,15 @@ func EditProfile(r *http.Request, w http.ResponseWriter) {
 		UserId: userId,
 		}
 
-		_,err := db.UpdateUser(&userInfo)
+		_,err = db.UpdateUser(&userInfo)
 
 		if err != nil{
-			w.Write([]byte("can't update user"))
-			w.WriteHeader(204)
-		}else{
-			w.Write([]byte("ok"))
-			w.WriteHeader(200)
+			w.Write([]byte("can't update user in editProfile"))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
-	}
+			w.Write([]byte("success"))
+			w.WriteHeader(http.StatusAccepted)
 	
 }
 
@@ -110,19 +110,21 @@ func ViewProfile(r *http.Request, w http.ResponseWriter) {
 	user,err := db.GetUserByPhone(phone)
 
 	if err != nil{
-		w.Write([]byte("user Not Found"))
-		w.WriteHeader(404)
-	}else{
+		w.Write([]byte("user Not Found with this phone number"))
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 		res,err := json.Marshal(user)
 
 		if err != nil{
-			w.Write([]byte("can't parse data to json"))
-			w.WriteHeader(500)
-		}else{
-			w.Write(res)
-			w.WriteHeader(200)
+			w.Write([]byte("can't parse data to json in viewProfile"))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
-	}
+			w.Write(res)
+			w.WriteHeader(http.StatusAccepted)
+		
+	
 
 }
 
