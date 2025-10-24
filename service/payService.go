@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 	"tick/db"
 	"tick/model"
 	"time"
@@ -53,48 +52,24 @@ func UpdateStatus(r *http.Request, w http.ResponseWriter) {
 	}
 }
 
-func RefundPrice(r *http.Request, w http.ResponseWriter) {
-	tId, err := strconv.Atoi(r.URL.Query().Get("ticketId"))
-	if err != nil {
-		w.Write([]byte("can't parse data to int"))
-		w.WriteHeader(http.StatusConflict)
-		return
-	}
+func RefundPrice(ticket *model.Ticket) (bool,string,int) {
 
-	payInfo, err := db.GetPayByTicketId(tId)
+
+	payInfo, err := db.GetPayByTicketId(ticket.TicketId)
 
 	if payInfo.PayStatus != "paid" {
-		return
+		return true,"",http.StatusAccepted
 	}
 
 	if err != nil {
-		w.Write([]byte("can't find payment with this ticket id"))
-		w.WriteHeader(http.StatusNotFound)
-		return
+		return false,"can't find payment with this ticket id",http.StatusNotFound
 	}
 
-	ticketInfo, err := db.GetTicketById(tId)
+
+	tripInfo, err := db.GetTripById(ticket.TripId)
 
 	if err != nil {
-		w.Write([]byte("can't find ticket with this ticket id"))
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	tripInfo, err := db.GetTripById(ticketInfo.TripId)
-
-	if err != nil {
-		w.Write([]byte("can't find trip with this trip id"))
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	seatInfo,err := db.GetSeatById(ticketInfo.SeatId)
-
-	if err != nil{
-		w.Write([]byte("can't find seat with this seat id"))
-		w.WriteHeader(http.StatusNotFound)
-		return
+		return false,"can't find trip with this trip id",http.StatusNotFound
 	}
 
 
@@ -102,41 +77,19 @@ func RefundPrice(r *http.Request, w http.ResponseWriter) {
 
 	refAmount := payInfo.Amount * refPercent
 
-	PayToUser(ticketInfo.UserId, refAmount)
+	PayToUser(ticket.UserId, refAmount)
 
 
 	payInfo.PayStatus = "Canceled"
-	ticketInfo.Status = "canceled"
-	seatInfo.Status = "free"
 	
 
 	_,err = db.UpdatePayment(*payInfo)
 
 	if err != nil{
-		w.Write([]byte("can't update pay with this info in refund price"))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		return false,"can't update pay with this info in refund price",http.StatusInternalServerError
 	}
 
-
-	_,err = db.UpdateTicket(ticketInfo)
-
-	if err != nil{
-		w.Write([]byte("can't update ticket with this info in refund price"))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	_,err = db.UpdateSeat(seatInfo)
-
-	if err != nil{
-		w.Write([]byte("can't update seat with this info in refund price"))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Write([]byte("refund process paid successfully"))
-	w.WriteHeader(http.StatusAccepted)
+	return true,"",http.StatusAccepted
 	
 }
 

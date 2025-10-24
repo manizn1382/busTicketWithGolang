@@ -94,6 +94,15 @@ func CancelTicket(r *http.Request, w http.ResponseWriter){
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+
+	success,reason,code := RefundPrice(ticketInfo) 
+
+	if(!success){
+		w.Write([]byte(reason))
+		w.WriteHeader(code)
+		return
+	}
+
 	ticketInfo.Status = "canceled"
 	_,err = db.UpdateTicket(ticketInfo)
 
