@@ -33,7 +33,7 @@ func SignIn(r *http.Request, w http.ResponseWriter) {
 		return
 	}
 	w.Write([]byte("success"))
-	w.WriteHeader(http.StatusAccepted)	
+	w.WriteHeader(http.StatusOK)	
 	
 }
 
@@ -63,7 +63,7 @@ func SignUp(r *http.Request, w http.ResponseWriter) {
 	}
 
 	w.Write([]byte("success"))
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusOK)
 
 }
 
@@ -98,7 +98,7 @@ func EditProfile(r *http.Request, w http.ResponseWriter) {
 			return
 		}
 			w.Write([]byte("success"))
-			w.WriteHeader(http.StatusAccepted)
+			w.WriteHeader(http.StatusOK)
 	
 }
 
@@ -122,10 +122,7 @@ func ViewProfile(r *http.Request, w http.ResponseWriter) {
 			return
 		}
 			w.Write(res)
-			w.WriteHeader(http.StatusAccepted)
-		
-	
-
+			w.WriteHeader(http.StatusOK)
 }
 
 

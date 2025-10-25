@@ -18,6 +18,28 @@ func ReserveTicket(r *http.Request, w http.ResponseWriter){
 		return
 	}
 
+	success,reason,code := ReserveSeat(ticket.SeatId)
+
+	if (!success){
+		w.Write([]byte(reason))
+		w.WriteHeader(code)
+		return
+	}
+
+	// seat,err := db.GetSeatById(ticket.SeatId)
+
+	// if err != nil{
+	// 	w.Write([]byte("can't find seat with this id"))
+	// 	w.WriteHeader(http.StatusNotFound)
+	// 	return
+	// }
+
+	// if seat.Status == "reserve"{
+	// 	w.Write([]byte("seat is reserved"))
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	return
+	// }
+
 	ticket.BookTime = time.Now()
 	ticket.Status = "reserved"
 
@@ -27,26 +49,19 @@ func ReserveTicket(r *http.Request, w http.ResponseWriter){
 		return
 	}
 
-	seat,err := db.GetSeatById(ticket.SeatId)
 
-	if err != nil{
-		w.Write([]byte("can't find seat with this id"))
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
+	//seat.Status = "reserve"
 
-	seat.Status = "reserve"
+	//_,err = db.UpdateSeat(seat)
 
-	_,err = db.UpdateSeat(seat)
-
-	if err != nil{
-		w.Write([]byte("can't update seat with this id"))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	// if err != nil{
+	// 	w.Write([]byte("can't update seat with this id"))
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	return
+	// }
 
 	w.Write([]byte("success"))
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusOK)
 }
 
 func PrintTicket(r *http.Request, w http.ResponseWriter){
@@ -75,7 +90,7 @@ func PrintTicket(r *http.Request, w http.ResponseWriter){
 	}
 
 	w.Write(ticketJson)
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusOK)
 }
 
 func CancelTicket(r *http.Request, w http.ResponseWriter){
@@ -96,12 +111,21 @@ func CancelTicket(r *http.Request, w http.ResponseWriter){
 	}
 
 	success,reason,code := RefundPrice(ticketInfo) 
-
+	
 	if(!success){
 		w.Write([]byte(reason))
 		w.WriteHeader(code)
 		return
 	}
+	
+	success,reason,code = MakeFree(ticketInfo.SeatId)
+	
+	if(!success){
+		w.Write([]byte(reason))
+		w.WriteHeader(code)
+		return
+	}
+	
 
 	ticketInfo.Status = "canceled"
 	_,err = db.UpdateTicket(ticketInfo)
@@ -112,26 +136,26 @@ func CancelTicket(r *http.Request, w http.ResponseWriter){
 		return
 	}
 
-	seatInfo,err := db.GetSeatById(ticketInfo.SeatId)
+	// seatInfo,err := db.GetSeatById(ticketInfo.SeatId)
 
-	if err != nil{
-		w.Write([]byte("can't find seat in cancelTicket func."))
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
+	// if err != nil{
+	// 	w.Write([]byte("can't find seat in cancelTicket func."))
+	// 	w.WriteHeader(http.StatusNotFound)
+	// 	return
+	// }
 
-	seatInfo.Status = "free"
+	// seatInfo.Status = "free"
 
-	_,err = db.UpdateSeat(seatInfo)
+	// _,err = db.UpdateSeat(seatInfo)
 
-	if err != nil{
-		w.Write([]byte("can't update seat in cancelTicket func."))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	// if err != nil{
+	// 	w.Write([]byte("can't update seat in cancelTicket func."))
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	return
+	// }
 
 	w.Write([]byte("success"))
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusOK)
 }
 
 func ViewUserTicketsHis(r *http.Request, w http.ResponseWriter){
@@ -160,6 +184,6 @@ func ViewUserTicketsHis(r *http.Request, w http.ResponseWriter){
 	}
 
 	w.Write(ticketListJson)
-	w.WriteHeader(http.StatusConflict)
+	w.WriteHeader(http.StatusOK)
 
 }

@@ -25,7 +25,7 @@ func SetPayment(r *http.Request, w http.ResponseWriter) {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else {
 			w.Write([]byte("success"))
-			w.WriteHeader(http.StatusAccepted)
+			w.WriteHeader(http.StatusOK)
 		}
 	}
 }

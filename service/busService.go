@@ -24,12 +24,12 @@ func AddBus(r *http.Request, w http.ResponseWriter) {
 	res := db.AddBus(bus)
 
 	if res != nil{
-		w.Write([]byte (res.Error()))
-	}else{
-		w.Write([]byte ("ok"))
-		w.WriteHeader(200)
+		w.Write([]byte ("can't add bus with these info"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
-
+		w.Write([]byte ("bus added successfully"))
+		w.WriteHeader(http.StatusOK)
 }
 
 func BindBusToTrip(r *http.Request, w http.ResponseWriter) {
@@ -42,19 +42,18 @@ func BindBusToTrip(r *http.Request, w http.ResponseWriter) {
 
 	if err != nil{
 		w.Write([]byte("it doesn't exist bus with this plate number"))
-		w.WriteHeader(404)
-	}else{
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 		busInfo.TripId = tripdId
-		_,err := db.UpdateBus(busInfo)
+		_,err = db.UpdateBus(busInfo)
 		if err != nil{
 			w.Write([]byte("can't update with this tripId"))
-			w.WriteHeader(500)
-		}else{
-			w.Write([]byte("success"))
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
-	}
-
+			w.Write([]byte("bus binded to trip successfully"))
+			w.WriteHeader(http.StatusOK)
 }
 
 func BindBusToCompany(r *http.Request, w http.ResponseWriter) {
@@ -67,16 +66,19 @@ func BindBusToCompany(r *http.Request, w http.ResponseWriter) {
 
 	if err != nil{
 		w.Write([]byte("it doesn't exist bus with this plate number"))
-		w.WriteHeader(404)
-	}else{
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 		busInfo.CompanyId = coId
-		_,err := db.UpdateBus(busInfo)
+		_,err = db.UpdateBus(busInfo)
+		
 		if err != nil{
 			w.Write([]byte("can't update with this coId"))
-			w.WriteHeader(500)
-		}else{
-			w.Write([]byte("success"))
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
-	}
+			w.Write([]byte("bus binded to company successfully"))
+			w.WriteHeader(http.StatusOK)
+		
+	
 }

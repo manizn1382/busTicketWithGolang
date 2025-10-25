@@ -24,12 +24,12 @@ func AddCompany(r *http.Request, w http.ResponseWriter){
 	res := db.AddCompany(coInfo)
 
 	if res != nil{
-		w.Write([]byte (res.Error()))
-	}else{
-		w.Write([]byte ("ok"))
-		w.WriteHeader(200)
+		w.Write([]byte ("company can't add to system."))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
-
+		w.Write([]byte ("company added successfully."))
+		w.WriteHeader(http.StatusOK)
 
 }
 
@@ -42,18 +42,19 @@ func ViewCompanyInfo(r *http.Request, w http.ResponseWriter){
 	
 	if err != nil{
 		w.Write([]byte ("can't find company with this phone"))
-		w.WriteHeader(404)
-	}else{
-		coInfo,err := json.Marshal(coInfo)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+		coInfoJs,err := json.Marshal(coInfo)
 
 		if err != nil{
 			w.Write([]byte ("can't parse company to json"))
-			w.WriteHeader(500)
-		}else{
-			w.Write(coInfo)
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
-	}
+			w.Write(coInfoJs)
+			w.WriteHeader(http.StatusOK)
+		
 }
 
 func CompanyList(r *http.Request, w http.ResponseWriter){
@@ -62,19 +63,17 @@ func CompanyList(r *http.Request, w http.ResponseWriter){
 
 	if err != nil{
 		w.Write([]byte("error in fetching companies."))
-		w.WriteHeader(404)
-	}else{
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 
-		coInfos,err := json.Marshal(coInfos)
+		coInfosJs,err := json.Marshal(coInfos)
 
 		if err != nil{
 			w.Write([]byte("can't convert data to json"))
-			w.WriteHeader(500)
-		}else{
-			w.Write(coInfos)
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
-		
-	}
-
+			w.Write(coInfosJs)
+			w.WriteHeader(http.StatusOK)
 }

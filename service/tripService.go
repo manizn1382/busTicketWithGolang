@@ -44,7 +44,7 @@ func SetTrip(r *http.Request,w http.ResponseWriter) {
 	}
 
 	w.Write([]byte("success"))
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusOK)
 	
 }
 
@@ -66,7 +66,7 @@ func SearchByOrigin(r *http.Request,w http.ResponseWriter) {
 			return
 		}
 			w.Write(tripInfoJs)
-			w.WriteHeader(http.StatusAccepted)
+			w.WriteHeader(http.StatusOK)
 		
 }
 
@@ -88,7 +88,7 @@ func SearchByDest(r *http.Request,w http.ResponseWriter) {
 			return
 		}
 			w.Write(tripInfoJs)
-			w.WriteHeader(http.StatusAccepted)
+			w.WriteHeader(http.StatusOK)
 		
 	
 }
@@ -110,7 +110,7 @@ func SearchByDate(r *http.Request,w http.ResponseWriter) {
 			return
 		}
 			w.Write(tripInfoJs)
-			w.WriteHeader(http.StatusAccepted)
+			w.WriteHeader(http.StatusOK)
 		
 	
 }
@@ -139,7 +139,7 @@ func ChangeStatus(r *http.Request,w http.ResponseWriter) {
 				return
 			}
 				w.Write([]byte("success"))
-				w.WriteHeader(http.StatusAccepted)
+				w.WriteHeader(http.StatusOK)
 			
 }
 
@@ -168,5 +168,5 @@ func ViewTripInfo(r *http.Request,w http.ResponseWriter) {
 				return
 			}
 				w.Write(res)
-				w.WriteHeader(http.StatusAccepted)
+				w.WriteHeader(http.StatusOK)
 }
