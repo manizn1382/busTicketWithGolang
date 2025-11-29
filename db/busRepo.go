@@ -44,11 +44,12 @@ func AddBus(b model.Bus) (error){
 
 	_,err = db.Exec(
 		`insert into bus 
-		(plateNumber,capacity,busType,coId)
+		(plateNumber,capacity,busType,status)
 		values
 		(?,?,?,?)`,
-		b.PlateNumber,b.Capacity,b.Type,b.CompanyId,
+		b.PlateNumber,b.Capacity,b.Type,b.Status,
 	)
+	fmt.Println(err)
 
 	if err != nil{
 		return errors.New("can't execute query")

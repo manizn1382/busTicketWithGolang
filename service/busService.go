@@ -3,8 +3,8 @@ package service
 import (
 	"net/http"
 	"strconv"
-	"tick/model"
 	"tick/db"
+	"tick/model"
 )
 
 func AddBus(r *http.Request, w http.ResponseWriter) {
@@ -13,15 +13,18 @@ func AddBus(r *http.Request, w http.ResponseWriter) {
 	pNum := r.FormValue("plateNumber")
 	Type := r.FormValue("Type")
 	cap,_ := strconv.Atoi(r.FormValue("Capacity"))
+	status := r.FormValue("Status")
 
 
 	bus := model.Bus{
 		PlateNumber: pNum,
 		Capacity: cap,
 		Type: Type,
+		Status: status,
 	}
 
 	res := db.AddBus(bus)
+
 
 	if res != nil{
 		w.Write([]byte ("can't add bus with these info"))

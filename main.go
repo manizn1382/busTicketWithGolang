@@ -1,25 +1,38 @@
 package main
 
 import (
-	"fmt"
 	"tick/config"
-	"tick/db"
+	"tick/controller"
+
+	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
-	//_"reflect"
 )
-
-
-
-
 
 
 func main() {
 	
 	config.SetEnv()
 	
-	message,err := db.AllUser()
+	r := gin.Default()
 
-	fmt.Println(*message,err)
+    bus := r.Group("/bus")
+    {
+    bus.Any("/:operation", controller.BusHandler)
+    }
+
+    
+
+    r.Run(":8081")
+
+// 	bus := r.Group("/bus")
+// {
+//     bus.POST("/create", controller.CreateBus)
+//     bus.POST("/update-status", controller.UpdateBusStatus)
+//     bus.POST("/assign-driver", controller.AssignDriver)
+//     bus.POST("/add-seats", controller.AddSeats)
+//     bus.POST("/remove-seats", controller.RemoveSeats)
+//     bus.POST("/search", controller.SearchBus)
+// }
 
 	// val := reflect.ValueOf(message)
     // typ := reflect.TypeOf(message)
