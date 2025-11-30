@@ -20,7 +20,11 @@ func main() {
     bus.Any("/:operation", controller.BusHandler)
     }
 
-    
+    company := r.Group("/company")
+    {
+    company.Any("/:operation", controller.CoHandler)
+    }
+
 
     r.Run(":8081")
 

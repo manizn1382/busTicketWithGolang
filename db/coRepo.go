@@ -13,11 +13,12 @@ import (
 func companyValidation(c model.Company) (error) {
 
 	nameV,_ := regexp.Compile(`^[a-zA-Z]{1,25}`)
-	phoneV,_ := regexp.Compile(`\+98[0-9]{10}`)
+	phoneV,_ := regexp.Compile(`^98[0-9]{10}$`)
+	AddrV,_ := regexp.Compile(`^[a-zA-Z]{10,}`)
 
 	if !nameV.MatchString(c.Name){return errors.New("name does not match the pattern")}
 	if !phoneV.MatchString(c.SupportPhone){return errors.New("phone does not match the pattern")}
-
+	if !AddrV.MatchString(c.Address){return errors.New("address does not match the pattern")}
 
 	return nil
 }
@@ -71,20 +72,16 @@ func GetCompanyByPhone(phone string) (*model.Company,error){
 		phone,
 	)
 
-	var r int
-	rowErr := res.Scan(&r)
-
-	if rowErr == sql.ErrNoRows{
-		return nil,errors.New("can't find dompany with this phoneNumber")
-	}
-	
-	
-	res.Scan(
+	er := res.Scan(
 		&coInfo.CompanyId,
 		&coInfo.Name,
 		&coInfo.SupportPhone,
 		&coInfo.Address,
 	)
+
+	if er == sql.ErrNoRows{
+		return nil,errors.New("can't find company with this phoneNumber")
+	}
 
 	return &coInfo,nil
 
@@ -92,6 +89,10 @@ func GetCompanyByPhone(phone string) (*model.Company,error){
 
 
 func UpdateCo(c *model.Company) (*sql.Result,error) {
+
+	if err:= companyValidation(*c);err!=nil{
+		return nil,err
+	}
 
 	db,err := sql.Open("mysql",config.Dsn)
 
