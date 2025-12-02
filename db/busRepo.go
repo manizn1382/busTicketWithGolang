@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"regexp"
 	"tick/config"
 	"tick/model"
-	"regexp"
 )
 
 
@@ -49,7 +49,6 @@ func AddBus(b model.Bus) (error){
 		(?,?,?,?)`,
 		b.PlateNumber,b.Capacity,b.Type,b.Status,
 	)
-	fmt.Println(err)
 
 	if err != nil{
 		return errors.New("can't execute query")
@@ -72,13 +71,13 @@ func GetBusByPlateNumber(pNum string) (*model.Bus,error){
 
 	res := db.QueryRow(
 		`select 
-		 IFNULL(busId, 0),
-		 IFNULL(plateNumber, ""),
-		 IFNULL(capacity, 0),
-		 IFNULL(tripId, 0),
-		 IFNULL(busType, ""),
-		 IFNULL(coId, 0),
-		 IFNULL(status, "no")
+		 IFNULL(busId,0),
+		 IFNULL(plateNumber,""),
+		 IFNULL(capacity,0),
+		 IFNULL(tripId,0),
+		 IFNULL(busType,""),
+		 IFNULL(coId,0),
+		 IFNULL(status,"")
 		 FROM Bus where plateNumber = ?`,
 		pNum,
 	)
@@ -119,18 +118,18 @@ func UpdateBus(b *model.Bus) (*sql.Result,error) {
 	    `update bus 
 		set plateNumber = ?, capacity = ?, tripId = ?, busType = ?, coId = ?, status = ?
 		where busId = ?`,
-		b.PlateNumber,b.Capacity,b.TripId,b.Type,b.CompanyId,b.BusId,b.Status,   
+		b.PlateNumber,b.Capacity,b.TripId,b.Type,b.CompanyId,b.Status,b.BusId,   
 	)
 
+
 	if err != nil{
-		log.Fatal(err)
 		return nil,errors.New("can't update Bus with these info")
 	}
 	return &res,nil
 }
 
 
-func DeleteBus(pNum int) (*sql.Result,error){
+func DeleteBus(pNum string) (*sql.Result,error){
 	db,err := sql.Open("mysql",config.Dsn)
 
 	if err != nil{
@@ -175,7 +174,17 @@ func AllBus() (*[]model.Bus,error){
 
 	defer db.Close()
 
-	res,err := db.Query(`select * from Bus`)
+	res,err := db.Query(
+		`select 
+		 IFNULL(busId,0),
+		 IFNULL(plateNumber,""),
+		 IFNULL(capacity,0),
+		 IFNULL(tripId,0),
+		 IFNULL(busType,""),
+		 IFNULL(coId,0),
+		 IFNULL(status,"") 
+		from Bus`,
+	)
 
 	
 	if err != nil{
