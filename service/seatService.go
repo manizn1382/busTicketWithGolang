@@ -2,8 +2,11 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 	"tick/db"
+	"tick/model"
 )
 
 func ViewSeatStatus(r *http.Request, w http.ResponseWriter){
@@ -29,6 +32,110 @@ func ViewSeatStatus(r *http.Request, w http.ResponseWriter){
 		w.Write(seatInfoJs)
 		w.WriteHeader(http.StatusOK)
 }
+
+func SeatUpdate(r *http.Request, w http.ResponseWriter) {
+	r.ParseForm()
+	seatId, seatIdErr := strconv.Atoi(r.FormValue("Id"))
+	busId,busIdErr := strconv.Atoi(r.FormValue("busId"))
+	seatNum,seatNumErr := strconv.Atoi(r.FormValue("seat"))
+	status := r.FormValue("status")
+	detail := r.FormValue("detail")
+
+	if seatIdErr != nil {
+		w.Write([]byte("seat Id has invalid format."))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if busIdErr != nil {
+		w.Write([]byte("bus Id has invalid format."))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if seatNumErr != nil {
+		w.Write([]byte("company Id has invalid format."))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	seatInfo := model.Seat{
+		SeatId: seatId,
+		BusId: busId,
+		SeatNum: seatNum,
+		Status: status,
+		Description: detail,
+	}
+
+	_, err := db.UpdateSeat(&seatInfo)
+
+	if err != nil {
+		w.Write([]byte("can't update seat in system."))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte("seat updated successfully."))
+	w.WriteHeader(http.StatusOK)
+}
+
+
+func CreateSeat(r *http.Request, w http.ResponseWriter){
+
+	r.ParseForm()
+	busId,busIdErr := strconv.Atoi(r.FormValue("busId"))
+	seatNum,seatNumErr := strconv.Atoi(r.FormValue("seat"))
+	status := r.FormValue("status")
+	detail := r.FormValue("detail")
+
+	if busIdErr != nil {
+		w.Write([]byte("bus Id has invalid format."))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if seatNumErr != nil {
+		w.Write([]byte("company Id has invalid format."))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	seatInfo := model.Seat{
+		BusId: busId,
+		SeatNum: seatNum,
+		Status: status,
+		Description: detail,
+	}
+
+	err := db.AddSeat(seatInfo)
+
+
+	if err != nil {
+		w.Write([]byte("can't Add seat in system."))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte("seat Created successfully."))
+	w.WriteHeader(http.StatusOK)
+}
+
+func SeatList(r *http.Request, w http.ResponseWriter) {
+
+	seatInfos, err := db.AllSeat()
+
+	if err != nil {
+		w.Write([]byte("error in fetching seats."))
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	seatInfosJs, err := json.Marshal(seatInfos)
+
+	if err != nil {
+		w.Write([]byte("can't convert data to json"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(seatInfosJs)
+	w.WriteHeader(http.StatusOK)
+}
+
 
 func ReserveSeat(seatId int) (bool,string,int) {
 	// seat := r.URL.Query().Get("seatNum")

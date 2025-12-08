@@ -39,7 +39,7 @@ func AddSeat(s model.Seat) (error){
 	defer db.Close()
 
 	_,err = db.Exec(
-		`insert into seat 
+		`insert into seats 
 		(busId,seatNum,stat,detail)
 		values
 		(?,?,?,?)`,
@@ -107,21 +107,19 @@ func GetSeatByNumber(sNum string) (*model.Seat,error){
 		sNum,
 	)
 
-	var r int
-	rowErr := res.Scan(&r)
-
-	if rowErr == sql.ErrNoRows{
-		return nil,errors.New("can't find seat with this seat Number")
-	}
-	
-	
-	res.Scan(
+	rowErr := res.Scan(
 		&SeatInfo.SeatId,
 		&SeatInfo.BusId,
 		&SeatInfo.SeatNum,
 		&SeatInfo.Status,
 		&SeatInfo.Description,
 	)
+
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find seat with this seat Number")
+	}
+
+	
 
 	return &SeatInfo,nil
 
