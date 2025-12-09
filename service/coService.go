@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	_ "strconv"
 	"tick/db"
 	"tick/model"
 )
