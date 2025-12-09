@@ -76,15 +76,7 @@ func GetTripById(tId int) (*model.Trip,error){
 		tId,
 	)
 	
-	var r int
-
-	rowErr := res.Scan(&r)
-
-	if rowErr == sql.ErrNoRows{
-		return nil,errors.New("can't find trip with this trip id")
-	}
-	
-	res.Scan(
+	rowErr := res.Scan(
 		&tripInfo.TripId,
 		&tripInfo.Origin,
 		&tripInfo.Dest,
@@ -94,6 +86,11 @@ func GetTripById(tId int) (*model.Trip,error){
 		&tripInfo.Status,
 		&tripInfo.Distance,
 	)
+
+
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find trip with this trip id")
+	}
 
 	return &tripInfo,nil
 
@@ -184,6 +181,7 @@ func GetTripByDate(date string) (*[]model.Trip,error){
 		"select * from trip where departureTime = ?",
 		date,
 	)
+
 	if err != nil{
 		log.Fatal(err)
 		return nil,errors.New("can't execute query for GetTripByDate func")

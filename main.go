@@ -35,6 +35,10 @@ func main() {
     user.Any("/:operation", controller.UserHandler)
     }
 
+    trip := r.Group("/trip")
+    {
+    trip.Any("/:operation", controller.TripHandler)
+    }
 
     r.Run(":8081")
 

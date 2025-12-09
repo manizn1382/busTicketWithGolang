@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"tick/service"
 
@@ -11,8 +10,6 @@ import (
 func BusHandler(c *gin.Context) {
 
 	op := c.Param("operation")
-
-	fmt.Println(op)
 
 	switch op {
 	case "CreateBus":
