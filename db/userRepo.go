@@ -18,8 +18,8 @@ import (
 
 func UserValidation(u model.User) (error) {
 
-	nameV,_ := regexp.Compile(`[0-9a-zA-Z#$@]{20}`)
-	phoneV,_ := regexp.Compile(`\+98[0-9]{10}`)
+	nameV,_ := regexp.Compile(`[0-9a-zA-Z#$@]{8,}`)
+	phoneV,_ := regexp.Compile(`98[0-9]{10}`)
 	nationalIdV,_ := regexp.Compile(`[0-9]{10}`)
 	RoleV,_ := regexp.Compile(`(?i)[admin|user|manager]`)
 
@@ -92,16 +92,8 @@ func GetUserByPhone(phoneNumber string) (*model.User,error){
 		"select * from User where phoneNumber = ?",
 		phoneNumber,
 	)
-	
-	var r int
-	rowErr := res.Scan(&r)
 
-	if rowErr == sql.ErrNoRows{
-		return nil,errors.New("can't find user with this phone Number")
-	}
-	
-	
-	res.Scan(
+	rowErr := res.Scan(
 		&userInfo.UserId,
 		&userInfo.Name,
 		&userInfo.Role,
@@ -110,6 +102,12 @@ func GetUserByPhone(phoneNumber string) (*model.User,error){
 		&userInfo.CreateAt,
 		&userInfo.NationalId,
 	)
+	
+
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find user with this phone Number")
+	}
+	
 
 	return &userInfo,nil
 
@@ -129,15 +127,7 @@ func GetUserByNationalId(nId string) (*model.User,error) {
 
 	res := db.QueryRow("select * from User where nationalId = ?",nId)
 
-	var r int
-	rowErr := res.Scan(&r)
-	
-	if rowErr == sql.ErrNoRows{
-		return nil,errors.New("can't find user with this national id")
-	}
-	
-	
-	res.Scan(
+	rowErr := res.Scan(
 		&userInfo.UserId,
 		&userInfo.Name,
 		&userInfo.Role,
@@ -147,6 +137,11 @@ func GetUserByNationalId(nId string) (*model.User,error) {
 		&userInfo.NationalId,
 	)
 
+	
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find user with this national id")
+	}
+	
 	
 	return &userInfo,nil
 
@@ -167,6 +162,9 @@ func UpdateUser(u *model.User) (*sql.Result,error) {
 	u.PassHash = newPassWordHash
 
 
+
+
+
 	
 	res,err := db.Exec(
 	    `update User 
@@ -185,7 +183,7 @@ func UpdateUser(u *model.User) (*sql.Result,error) {
 
 
 
-func DeleteUser(nId int) (*sql.Result,error){
+func DeleteUser(nId string) (*sql.Result,error){
 	db,err := sql.Open("mysql",config.Dsn)
 
 	if err != nil{

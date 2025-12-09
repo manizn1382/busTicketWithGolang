@@ -30,6 +30,11 @@ func main() {
     seat.Any("/:operation", controller.SeatHandler)
     }
 
+    user := r.Group("/user")
+    {
+    user.Any("/:operation", controller.UserHandler)
+    }
+
 
     r.Run(":8081")
 
