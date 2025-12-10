@@ -50,7 +50,7 @@ func ReserveTicket(r *http.Request, w http.ResponseWriter){
 	}
 
 	if tripInfo.Status == "closed"{
-		w.Write([]byte("this trip is closed.select another trip."))
+		w.Write([]byte("this trip is closed. select another trip."))
 		w.WriteHeader(http.StatusConflict)
 		return
 	}

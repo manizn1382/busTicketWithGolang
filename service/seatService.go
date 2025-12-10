@@ -168,7 +168,7 @@ func MakeFree(seatId int) (bool,string,int){
 	}
 
 	if seatInfo.Status == "free"{
-		return false,"this seat is already free",http.StatusInternalServerError
+		return true,"this seat is already free",http.StatusInternalServerError
 	} 
 	seatInfo.Status = "Free"
 	_,err = db.UpdateSeat(seatInfo)

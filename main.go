@@ -45,6 +45,11 @@ func main() {
         ticket.Any("/:operation",controller.TicketHandler)
     }
 
+    payment := r.Group("/payment")
+    {
+        payment.Any("/:operation",controller.PayHandler)
+    }
+
     r.Run(config.ConnectionPort)
 
 
