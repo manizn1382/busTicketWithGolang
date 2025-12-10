@@ -40,7 +40,12 @@ func main() {
     trip.Any("/:operation", controller.TripHandler)
     }
 
-    r.Run(":8081")
+    ticket := r.Group("/ticket")
+    {
+        ticket.Any("/:operation",controller.TicketHandler)
+    }
+
+    r.Run(config.ConnectionPort)
 
 
 }

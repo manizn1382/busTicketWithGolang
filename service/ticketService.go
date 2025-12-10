@@ -2,7 +2,9 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 	"tick/db"
 	"tick/model"
 	"time"
@@ -10,15 +12,20 @@ import (
 
 func ReserveTicket(r *http.Request, w http.ResponseWriter){
 
-	var ticket model.Ticket
+	r.ParseForm()
 
-	if err := json.NewDecoder(r.Body).Decode(&ticket);err!=nil{
-		w.Write([]byte("invalid json for reserveTicket"))
+	tId,err1 := strconv.Atoi(r.FormValue("tripId"))
+	uId,err2 := strconv.Atoi(r.FormValue("userId"))
+	sId,err3 := strconv.Atoi(r.FormValue("seatId"))
+
+	if err1 != nil || err2 != nil || err3 != nil{
+		w.Write([]byte("error in converting numeric Id from string to int"))
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
 
-	success,reason,code := ReserveSeat(ticket.SeatId)
+
+	success,reason,code := ReserveSeat(sId)
 
 	if (!success){
 		w.Write([]byte(reason))
@@ -26,54 +33,54 @@ func ReserveTicket(r *http.Request, w http.ResponseWriter){
 		return
 	}
 
-	// seat,err := db.GetSeatById(ticket.SeatId)
+	ticketInfo := model.Ticket{
+		TripId: tId,
+		UserId: uId,
+		SeatId: sId,
+		Status: "reserved",
+		BookTime: time.Now(),
+	}
 
-	// if err != nil{
-	// 	w.Write([]byte("can't find seat with this id"))
-	// 	w.WriteHeader(http.StatusNotFound)
-	// 	return
-	// }
+	tripInfo,err := db.GetTripById(tId)
 
-	// if seat.Status == "reserve"{
-	// 	w.Write([]byte("seat is reserved"))
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	return
-	// }
+	if err != nil {
+		w.Write([]byte("can't find trip with this id"))
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 
-	ticket.BookTime = time.Now()
-	ticket.Status = "reserved"
+	if tripInfo.Status == "closed"{
+		w.Write([]byte("this trip is closed.select another trip."))
+		w.WriteHeader(http.StatusConflict)
+		return
+	}
 
-	if err := db.AddTicket(ticket);err!=nil{
+	if err := db.AddTicket(ticketInfo);err!=nil{
+		fmt.Println(err)
 		w.Write([]byte("can't add this ticket to db"))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 
-	//seat.Status = "reserve"
-
-	//_,err = db.UpdateSeat(seat)
-
-	// if err != nil{
-	// 	w.Write([]byte("can't update seat with this id"))
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	return
-	// }
-
-	w.Write([]byte("success"))
+	w.Write([]byte("ticket added successfully"))
 	w.WriteHeader(http.StatusOK)
 }
 
 func PrintTicket(r *http.Request, w http.ResponseWriter){
-	var ticket model.Ticket
 
-	if err := json.NewDecoder(r.Body).Decode(&ticket);err!=nil{
-		w.Write([]byte("invalid json for printTicket"))
+	r.ParseForm()
+
+	tId,err := strconv.Atoi(r.FormValue("ticketId"))
+
+
+	if err != nil{
+		w.Write([]byte("error in converting ticket Id to numeric value"))
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
 
-	ticketInfo,err := db.GetTicketById(ticket.TicketId)
+	ticketInfo,err := db.GetTicketById(tId)
 
 	if err != nil{
 		w.Write([]byte("can't find ticket in PrintTicket func."))
@@ -94,15 +101,19 @@ func PrintTicket(r *http.Request, w http.ResponseWriter){
 }
 
 func CancelTicket(r *http.Request, w http.ResponseWriter){
-	var ticket model.Ticket
 
-	if err := json.NewDecoder(r.Body).Decode(&ticket);err!=nil{
-		w.Write([]byte("invalid json for cancelTicket"))
+	r.ParseForm()
+
+	tId,err := strconv.Atoi(r.FormValue("ticketId"))
+
+	if err != nil{
+		w.Write([]byte("error in converting ticketId to int value"))
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
 
-	ticketInfo,err := db.GetTicketById(ticket.TicketId)
+
+	ticketInfo,err := db.GetTicketById(tId)
 
 	if err != nil{
 		w.Write([]byte("can't find ticket in cancelTicket func."))
@@ -136,38 +147,23 @@ func CancelTicket(r *http.Request, w http.ResponseWriter){
 		return
 	}
 
-	// seatInfo,err := db.GetSeatById(ticketInfo.SeatId)
-
-	// if err != nil{
-	// 	w.Write([]byte("can't find seat in cancelTicket func."))
-	// 	w.WriteHeader(http.StatusNotFound)
-	// 	return
-	// }
-
-	// seatInfo.Status = "free"
-
-	// _,err = db.UpdateSeat(seatInfo)
-
-	// if err != nil{
-	// 	w.Write([]byte("can't update seat in cancelTicket func."))
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	return
-	// }
-
-	w.Write([]byte("success"))
+	w.Write([]byte("ticket cancelled successfully"))
 	w.WriteHeader(http.StatusOK)
 }
 
 func ViewUserTicketsHis(r *http.Request, w http.ResponseWriter){
-	var user model.User
 
-	if err := json.NewDecoder(r.Body).Decode(&user);err!=nil{
-		w.Write([]byte("can't update seat in viewUserTicketHis func."))
+	r.ParseForm()
+
+	uId,err := strconv.Atoi(r.FormValue("userId"))
+
+	if err != nil {
+		w.Write([]byte("can't convert the string value to int value"))
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
 
-	ticketList,err := db.GetUserTicketHis(user.UserId)
+	ticketList,err := db.GetUserTicketHis(uId)
 
 	if err != nil{
 		w.Write([]byte("can't find ticket in viewUserTicketHis func."))

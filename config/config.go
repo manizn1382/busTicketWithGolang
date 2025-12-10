@@ -15,6 +15,7 @@ var DBPort string
 var DBName string
 var RefTime string
 var Dsn    string
+var ConnectionPort string
 
 func SetEnv() {
 
@@ -31,5 +32,6 @@ func SetEnv() {
         DBName = os.Getenv("dbName")
         Dsn = os.Getenv("dsn")
         RefTime = os.Getenv("refTime")
+        ConnectionPort = os.Getenv("connectionPort")
 
 }

@@ -137,7 +137,6 @@ func SeatList(r *http.Request, w http.ResponseWriter) {
 
 
 func ReserveSeat(seatId int) (bool,string,int) {
-	// seat := r.URL.Query().Get("seatNum")
 
 	seatInfo,err := db.GetSeatById(seatId)
 
@@ -161,7 +160,6 @@ func ReserveSeat(seatId int) (bool,string,int) {
 }
 
 func MakeFree(seatId int) (bool,string,int){
-	//seat := r.URL.Query().Get("seatNum")
 
 	seatInfo,err := db.GetSeatById(seatId)
 

@@ -71,21 +71,21 @@ func GetSeatById(Id int) (*model.Seat,error){
 		Id,
 	)
 
-	var r int
-	rowErr := res.Scan(&r)
-
-	if rowErr == sql.ErrNoRows{
-		return nil,errors.New("can't find seat with this id")
-	}
-	
-	
-	res.Scan(
+	rowErr := res.Scan(
 		&SeatInfo.SeatId,
 		&SeatInfo.BusId,
 		&SeatInfo.SeatNum,
 		&SeatInfo.Status,
 		&SeatInfo.Description,
 	)
+
+
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find seat with this id")
+	}
+	
+	
+	
 
 	return &SeatInfo,nil
 

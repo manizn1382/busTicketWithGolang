@@ -57,13 +57,15 @@ func RefundPrice(ticket *model.Ticket) (bool,string,int) {
 
 	payInfo, err := db.GetPayByTicketId(ticket.TicketId)
 
+	if err != nil {
+		return false,"can't find payment with this ticket id",http.StatusNotFound
+	}
+
+	
 	if payInfo.PayStatus != "paid" {
 		return true,"",http.StatusAccepted
 	}
 
-	if err != nil {
-		return false,"can't find payment with this ticket id",http.StatusNotFound
-	}
 
 
 	tripInfo, err := db.GetTripById(ticket.TripId)

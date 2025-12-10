@@ -111,15 +111,8 @@ func GetTicketById(tId int) (*model.Ticket,error){
 		tId,
 	)
 	
-	var r int 
-	rowErr := res.Scan(&r)
 
-	if rowErr == sql.ErrNoRows{
-		return nil,errors.New("can't find ticket with this id")
-	}
-	
-	
-	res.Scan(
+	rowErr := res.Scan(
 		&ticketInfo.TicketId,
 		&ticketInfo.TripId,
 		&ticketInfo.UserId,
@@ -128,6 +121,10 @@ func GetTicketById(tId int) (*model.Ticket,error){
 		&ticketInfo.Status,
 	)
 
+	if rowErr == sql.ErrNoRows{
+		return nil,errors.New("can't find ticket with this id")
+	}
+	
 	return &ticketInfo,nil
 
 }
