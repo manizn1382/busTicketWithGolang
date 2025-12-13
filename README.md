@@ -57,18 +57,17 @@ for more detail watch this [link](https://dbdiagram.io/d/68a331fcec93249d1e1717e
 
 ## Project Structure
 
-graph TD
-
-    ROOT --> CONFIG["config<br/>Application configuration"]
-    ROOT --> CONTROLLER["controller<br/>HTTP handlers"]
-    ROOT --> SERVICE["service<br/>Business logic"]
-    ROOT --> DB["db<br/>Database access layer"]
-    ROOT --> MODEL["model<br/>Domain models"]
-
-    ROOT --> MAIN["main.go<br/>Application entry point"]
-    ROOT --> ENV[".env"]
-    ROOT --> GOMOD["go.mod"]
-    ROOT --> README["README.md"]
+BUSTICKETWITHGOLANG/
+├── config/
+├── controller/
+├── db/
+├── model/
+├── service/
+├── .env
+├── go.mod
+├── go.sum
+├── main.go
+└── README.md
 
 ## Postman Collection
 
