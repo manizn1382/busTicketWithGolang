@@ -57,7 +57,7 @@ for more detail watch this [link](https://dbdiagram.io/d/68a331fcec93249d1e1717e
 
 ## Project Structure
 
-BUSTICKETWITHGOLANG/
+BUSTICKETWITHGOLANG/</br>
 ├── config/</br>
 ├── controller/</br>
 ├── db/</br>
