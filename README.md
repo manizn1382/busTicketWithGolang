@@ -95,7 +95,7 @@ go 1.25.0
 
 ## requirements
 
-go.mod
+go.mod</br>
 go.sum
 
 ## run project
