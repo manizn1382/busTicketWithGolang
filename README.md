@@ -58,16 +58,16 @@ for more detail watch this [link](https://dbdiagram.io/d/68a331fcec93249d1e1717e
 ## Project Structure
 
 BUSTICKETWITHGOLANG/
-├── config/
-├── controller/
-├── db/
-├── model/
-├── service/
-├── .env
-├── go.mod
-├── go.sum
-├── main.go
-└── README.md
+├── config/</br>
+├── controller/</br>
+├── db/</br>
+├── model/</br>
+├── service/</br>
+├── .env</br>
+├── go.mod</br>
+├── go.sum</br>
+├── main.go</br>
+└── README.md</br>
 
 ## Postman Collection
 
