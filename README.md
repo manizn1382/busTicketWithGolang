@@ -8,12 +8,13 @@ The service is designed to be consumed by any frontend client (web or mobile).
 
 ## data model
 Main entities:
-- users
-- buses
-- routes
-- schedules
-- seats
-- tickets
+- user
+- bus
+- seat
+- ticket
+- trip
+- payment
+- company
 
 ## ERD
 
@@ -57,7 +58,6 @@ for more detail watch this [link](https://dbdiagram.io/d/68a331fcec93249d1e1717e
 ## Project Structure
 
 graph TD
-    ROOT["BUSICKETWITHGOLANG"]
 
     ROOT --> CONFIG["config<br/>Application configuration"]
     ROOT --> CONTROLLER["controller<br/>HTTP handlers"]
