@@ -94,7 +94,7 @@ config these parameters of .env file base on individual setting:
 - host
 - port
 - dbName
-- dsn = "[userName]:[passWord]@tcp([host]:[port)/[dbName]?parseTime=true"
+- dsn = "[userName]:[passWord]@tcp([host]:[port])/[dbName]?parseTime=true"
 - refTime = "2006-01-02 15:04:05"
 - connectionPort
 
