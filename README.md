@@ -5,6 +5,14 @@ It provides endpoints for managing users, routes, buses, seat reservations,
 and ticket bookings.  
 The service is designed to be consumed by any frontend client (web or mobile).
 
+## requirements
+
+go.mod</br>
+go.sum
+
+## go version
+
+go 1.25.0
 
 ## data model
 Main entities:
@@ -16,12 +24,17 @@ Main entities:
 - payment
 - company
 
+## Tech Stack
+
+- Golang
+- Gin
+- MySQL
+
 ## ERD
 
 <img width="1421" height="870" alt="Untitled (2)" src="https://github.com/user-attachments/assets/138d9e8d-4a5f-4019-9622-e468396da3e9" />
 
 for more detail watch this [link](https://dbdiagram.io/d/68a331fcec93249d1e1717ec)
-
 
 
 ## Design Decisions
@@ -30,12 +43,6 @@ for more detail watch this [link](https://dbdiagram.io/d/68a331fcec93249d1e1717e
 - REST architecture is used for simplicity and interoperability.
 - Database access is abstracted via repository layer.
 - each module separated to individual package(service,controller,model,config,db).
-
-## Tech Stack
-
-- Golang
-- Gin
-- MySQL
 
 ## Features
 
@@ -80,30 +87,23 @@ You can explore and test the API endpoints using the Postman collection below:
 
 The service is configured using environment variables:
 
-- userName = "root"
-- passWord = "Zameni82#"
-- host = "127.0.0.1"
-- port = "3306"
-- dbName = "ticketplatform"
-- dsn = "root:Zameni82#@tcp(127.0.0.1:3306)/ticketplatform?parseTime=true"
+config these parameters of .env file base on individual setting:
+
+- userName
+- passWord
+- host
+- port
+- dbName
+- dsn = "[userName]:[passWord]@tcp([host]:[port])/[dbName]?parseTime=true"
 - refTime = "2006-01-02 15:04:05"
-- connectionPort = ":8081"
-
-## go version
-
-go 1.25.0
-
-## requirements
-
-go.mod
-go.sum
+- connectionPort
 
 ## run project
 
-execute this command in cmd or gitBash:
-
+execute this command:
+``` bash
 go run main.go
-
+```
 
 
 
