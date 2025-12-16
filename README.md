@@ -7,12 +7,23 @@ The service is designed to be consumed by any frontend client (web or mobile).
 
 ## requirements
 
+first build module with this command:
+
+```bash
+go mod init yourModule-name
+```
+and add below files to root project:
+
 go.mod</br>
 go.sum
 
 ## go version
 
+use the go base on last version
+
+```bash
 go 1.25.0
+```
 
 ## data model
 Main entities:
